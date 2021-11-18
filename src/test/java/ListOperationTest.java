@@ -10,31 +10,32 @@ import java.util.List;
 import java.util.Optional;
 
 public class ListOperationTest {
-    private Cars octavia;
-    private Cars rapid;
-    private Cars karoq;
-    private Cars corolla;
-    private Cars camry;
-    private Cars superb;
-    private Cars kodiaq;
-    private Cars vesta;
+    private Car octavia;
+    private Car rapid;
+    private Car karoq;
+    private Car corolla;
+    private Car camry;
+    private Car superb;
+    private Car kodiaq;
+    private Car vesta;
 
     private SimpleList test;
     private SimpleList testNull;
+    private SimpleList basicTest;
 
 
     @Before
     public void setUp() throws NoEntityException {
         testNull = new ListOperation();
         test = new ListOperation();
-        octavia = new Cars("Octavia", "2018", 1.7f);
-        rapid = new Cars("Rapid", "2015", 0.7f);
-        karoq = new Cars("Karoq", "2019", 2f);
-        kodiaq = new Cars("Kodiaq", "2020", 2.4f);
-        superb = new Cars("Superb", "2021", 3.1f);
-        camry = new Cars("Camry", "2015", 1f);
-        corolla = new Cars("Corolla", "2020", 1.5f);
-        vesta = new Cars("Vesta", "2021", 1f);
+        octavia = new Car("Octavia", "2018", 1.7f);
+        rapid = new Car("Rapid", "2015", 0.7f);
+        karoq = new Car("Karoq", "2019", 2f);
+        kodiaq = new Car("Kodiaq", "2020", 2.4f);
+        superb = new Car("Superb", "2021", 3.1f);
+        camry = new Car("Camry", "2015", 1f);
+        corolla = new Car("Corolla", "2020", 1.5f);
+        vesta = new Car("Vesta", "2021", 1f);
 
         test.add(rapid);
         test.add(octavia);
@@ -43,8 +44,17 @@ public class ListOperationTest {
         test.add(superb);
         test.add(camry);
         test.add(corolla);
+
+        basicTest = test;
     }
 
+    public SimpleList createIndexList(int count) throws NoEntityException {
+        SimpleList<Car> indexList = new ListOperation();
+        for (int i = 0; i < count; i++) {
+            indexList.add(new Car(String.valueOf(i), String.valueOf(count - 1 - i), (float) i / 10f));
+        }
+        return indexList;
+    }
 
     @Test
     public void add() throws ArrayIndexOutOfBoundsException, NoEntityException {
@@ -52,19 +62,19 @@ public class ListOperationTest {
         test2.add(octavia);
         test2.add(karoq);
         test2.add(rapid);
-        //todo test2.add(null);
 
-
-        List<Cars> actual = new ArrayList<>();
+        List<Car> actual = new ArrayList<>();
         actual.add(octavia);
         actual.add(rapid);
 
         Assert.assertEquals(test2.get(0).get(), actual.get(0));
-
         Assert.assertEquals(test2.get(2).get(), actual.get(1));
-        //todo если null среди листа
-        // Assert.assertNotNull(test2.get(3).get());
+    }
 
+    @Test(expected = NoEntityException.class)
+    public void addNull() throws NoEntityException {
+        SimpleList test2 = new ListOperation();
+        test2.add(null);
     }
 
     @Test
@@ -73,8 +83,18 @@ public class ListOperationTest {
         Assert.assertEquals(test.get(5).get(), camry);
     }
 
+    @Test(expected = NoEntityException.class)
+    public void insertNull() throws Exception {
+        test.insert(3, null);
+    }
+
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
+    public void insertOutIndexArray() throws Exception {
+        test.insert(5000, new Car("test", "test", 73.27f));
+    }
+
     @Test
-    public void insert_in_begin() throws Exception {
+    public void insertInBegin() throws Exception {
         testNull.insert(0, corolla);
         Assert.assertEquals(testNull.get(0).get(), corolla);
     }
@@ -88,8 +108,7 @@ public class ListOperationTest {
     }
 
     @Test
-    public void remove_from_nullArray() throws Exception {
-        System.out.println(testNull.size());
+    public void removeFromNullArray() throws Exception {
         testNull.add(camry);
         testNull.remove(0);
     }
@@ -120,7 +139,6 @@ public class ListOperationTest {
         Assert.assertEquals(test.size(), 9);
     }
 
-
     @Test
     public void first() {
         Assert.assertTrue(test.first(vesta) == -1 ? true : false);
@@ -137,7 +155,6 @@ public class ListOperationTest {
     public void contains() {
         Assert.assertTrue(test.contains(vesta) == false ? true : false);
         Assert.assertTrue(test.contains(superb));
-
     }
 
     @Test
@@ -147,14 +164,15 @@ public class ListOperationTest {
         test2.add(octavia);
         test2.add(rapid);
         test2.add(kodiaq);
+
         int sizeTest2 = test2.size();
         test2.addAll(test);
         Assert.assertTrue((sizeTest2 + test.size()) == test2.size() ? true : false);
+
         for (int i = sizeTest2, j = 0; i < test2.size(); j++, i++) {
             Assert.assertTrue(test2.get(i).equals(test.get(j)));
         }
     }
-
 
     @Test
     public void isEmpty() {
@@ -163,7 +181,6 @@ public class ListOperationTest {
 
     @Test
     public void shuffle() throws NoEntityException {
-        SimpleList basicTest = test;
         SimpleList shufTest = test.shuffle();
         Assert.assertTrue((shufTest.size() == test.size()) ? true : false);
         Assert.assertNotEquals(shufTest, test);
@@ -171,17 +188,34 @@ public class ListOperationTest {
     }
 
     @Test
-    public void sortFloat() throws NoEntityException, ArrayIndexOutOfBoundsException {
-        SimpleList basicTest = test;
-        SimpleList sortPrice = new ListOperation();
-        SimpleList sortAge = new ListOperation();
-        SimpleList sortName = new ListOperation();
+    public void shuffleIndexList() throws NoEntityException, ArrayIndexOutOfBoundsException {
+        SimpleList indexList = createIndexList(1000);
+        SimpleList shufTest = indexList.shuffle();
+        Assert.assertNotEquals(shufTest, indexList);
+        for (int i = 0; i < shufTest.size(); i++) {
+            Assert.assertNotEquals(shufTest.get(i), indexList.get(i));
+        }
+    }
 
-        sortPrice.add(rapid);
-        sortPrice.add(camry);
-        sortPrice.add(corolla);
-        sortPrice.add(octavia);
-        sortPrice.add(karoq);
+    @Test
+    public void sortIndexListFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException {
+
+        SimpleList indexList = createIndexList(1000);
+
+        Comparator<Car> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
+        SimpleList<Car> sortTestPrice = indexList.sort(comparatorPrice);
+        Assert.assertNotEquals(sortTestPrice, indexList);
+
+        for (int i = 0, j = 1; i < sortTestPrice.size() - 1; i++, j++) {
+            Assert.assertTrue(0 < (sortTestPrice
+                    .get(j).map(x -> x.getPrice()).get()) - (sortTestPrice
+                    .get(i).map(x -> x.getPrice()).get()));
+        }
+    }
+
+    @Test
+    public void sortStringAge() throws NoEntityException, ArrayIndexOutOfBoundsException {
+        SimpleList sortAge = new ListOperation();
 
         sortAge.add(camry);
         sortAge.add(rapid);
@@ -189,37 +223,54 @@ public class ListOperationTest {
         sortAge.add(karoq);
         sortAge.add(corolla);
 
+        Comparator<Car> comparatorAge = Comparator.comparing(obj -> obj.getAge());
+        SimpleList sortTestAge = test.sort(comparatorAge);
+        Assert.assertEquals(test, basicTest);
+        Assert.assertNotEquals(sortTestAge, test);
+
+        for (int i = 0; i < 5; i++) {
+            Assert.assertEquals(sortAge.get(i), sortTestAge.get(i));
+        }
+    }
+
+    @Test
+    public void sortStringName() throws NoEntityException, ArrayIndexOutOfBoundsException {
+        SimpleList sortName = new ListOperation();
+
         sortName.add(camry);
         sortName.add(corolla);
         sortName.add(karoq);
         sortName.add(kodiaq);
         sortName.add(octavia);
 
-
-        Comparator<Cars> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
-        SimpleList sortTestPrice = test.sort(comparatorPrice);
-        Assert.assertEquals(test, basicTest);
-        Assert.assertNotEquals(sortTestPrice, test);
-
-
-        Comparator<Cars> comparatorAge = Comparator.comparing(obj -> obj.getAge());
-        SimpleList sortTestAge = test.sort(comparatorAge);
-        Assert.assertEquals(test, basicTest);
-        Assert.assertNotEquals(sortTestAge, test);
-
-
-        Comparator<Cars> comparatorName = Comparator.comparing(obj -> obj.getName());
+        Comparator<Car> comparatorName = Comparator.comparing(obj -> obj.getName());
         SimpleList sortTestName = test.sort(comparatorName);
         Assert.assertEquals(test, basicTest);
         Assert.assertNotEquals(sortTestName, test);
 
+        for (int i = 0; i < 5; i++) {
+            Assert.assertEquals(sortName.get(i), sortTestName.get(i));
+        }
+    }
+
+    @Test
+    public void sortFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException {
+        SimpleList sortPrice = new ListOperation();
+
+        sortPrice.add(rapid);
+        sortPrice.add(camry);
+        sortPrice.add(corolla);
+        sortPrice.add(octavia);
+        sortPrice.add(karoq);
+
+        Comparator<Car> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
+        SimpleList sortTestPrice = test.sort(comparatorPrice);
+        Assert.assertEquals(test, basicTest);
+        Assert.assertNotEquals(sortTestPrice, test);
 
         for (int i = 0; i < 5; i++) {
             Assert.assertEquals(sortPrice.get(i), sortTestPrice.get(i));
-            Assert.assertEquals(sortAge.get(i), sortTestAge.get(i));
-            Assert.assertEquals(sortName.get(i), sortTestName.get(i));
         }
-
     }
 }
 
