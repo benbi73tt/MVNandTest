@@ -51,7 +51,7 @@ public class ListOperationTest {
     public SimpleList createIndexList(int count) throws NoEntityException {
         SimpleList<Car> indexList = new ListOperation();
         for (int i = 0; i < count; i++) {
-            indexList.add(new Car(String.valueOf(i), String.valueOf(count - 1 - i), (float) i / 10f));
+            indexList.add(new Car(String.valueOf(i), String.valueOf(count - 1 - i), (float) i));
         }
         return indexList;
     }
@@ -199,7 +199,6 @@ public class ListOperationTest {
 
     @Test
     public void sortIndexListFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException {
-
         SimpleList indexList = createIndexList(1000);
 
         Comparator<Car> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
