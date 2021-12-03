@@ -281,19 +281,17 @@ public class ListOperationTest {
         SimpleList mycar = createIndexList(3000000);
         mycar = mycar.shuffle();
 
-        SimpleList youcar = createIndexList(1500000);
+        SimpleList youcar = createIndexList(15000);
         youcar = youcar.shuffle();
 
 
         long start = System.nanoTime();
         mycar = mycar.sort(comparatorName);
         long finish = System.nanoTime();
-        print(mycar);
 
         long start1 = System.nanoTime();
         youcar = youcar.sortingThreads(comparatorName);
-        long finish1 = System.nanoTime();
-        print(youcar);
+        long finish1 = System.nanoTime();//        print(youcar);
 
         long elapsed = finish - start;
         long elapsed1 = finish1 - start1;
