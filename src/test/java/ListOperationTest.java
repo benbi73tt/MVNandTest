@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
+import static ru.madbrains.impl.Program.print;
 
 public class ListOperationTest {
     private Car octavia;
@@ -116,7 +119,7 @@ public class ListOperationTest {
     @Test
     public void get() throws Exception {
         for (int i = 0; i < test.size(); i++) {
-            Assert.assertTrue(test.get(i) == Optional.empty() ? false : true);
+            Assert.assertTrue(test.get(i) != Optional.empty());
         }
     }
 
@@ -198,10 +201,10 @@ public class ListOperationTest {
     }
 
     @Test
-    public void sortIndexListFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException {
+    public void sortIndexListFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException, ExecutionException, InterruptedException {
         SimpleList indexList = createIndexList(1000);
 
-        Comparator<Car> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
+        Comparator<Car> comparatorPrice = Comparator.comparing(Car::getPrice);
         SimpleList<Car> sortTestPrice = indexList.sort(comparatorPrice);
         Assert.assertNotEquals(sortTestPrice, indexList);
 
@@ -213,7 +216,7 @@ public class ListOperationTest {
     }
 
     @Test
-    public void sortStringAge() throws NoEntityException, ArrayIndexOutOfBoundsException {
+    public void sortStringAge() throws NoEntityException, ArrayIndexOutOfBoundsException, ExecutionException, InterruptedException {
         SimpleList sortAge = new ListOperation();
 
         sortAge.add(camry);
@@ -222,7 +225,7 @@ public class ListOperationTest {
         sortAge.add(karoq);
         sortAge.add(corolla);
 
-        Comparator<Car> comparatorAge = Comparator.comparing(obj -> obj.getAge());
+        Comparator<Car> comparatorAge = Comparator.comparing(Car::getAge);
         SimpleList sortTestAge = test.sort(comparatorAge);
         Assert.assertEquals(test, basicTest);
         Assert.assertNotEquals(sortTestAge, test);
@@ -233,7 +236,7 @@ public class ListOperationTest {
     }
 
     @Test
-    public void sortStringName() throws NoEntityException, ArrayIndexOutOfBoundsException {
+    public void sortStringName() throws NoEntityException, ArrayIndexOutOfBoundsException, ExecutionException, InterruptedException {
         SimpleList sortName = new ListOperation();
 
         sortName.add(camry);
@@ -242,7 +245,7 @@ public class ListOperationTest {
         sortName.add(kodiaq);
         sortName.add(octavia);
 
-        Comparator<Car> comparatorName = Comparator.comparing(obj -> obj.getName());
+        Comparator<Car> comparatorName = Comparator.comparing(Car::getName);
         SimpleList sortTestName = test.sort(comparatorName);
         Assert.assertEquals(test, basicTest);
         Assert.assertNotEquals(sortTestName, test);
@@ -253,7 +256,7 @@ public class ListOperationTest {
     }
 
     @Test
-    public void sortFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException {
+    public void sortFloatPrice() throws NoEntityException, ArrayIndexOutOfBoundsException, ExecutionException, InterruptedException {
         SimpleList sortPrice = new ListOperation();
 
         sortPrice.add(rapid);
@@ -262,7 +265,7 @@ public class ListOperationTest {
         sortPrice.add(octavia);
         sortPrice.add(karoq);
 
-        Comparator<Car> comparatorPrice = Comparator.comparing(obj -> obj.getPrice());
+        Comparator<Car> comparatorPrice = Comparator.comparing(Car::getPrice);
         SimpleList sortTestPrice = test.sort(comparatorPrice);
         Assert.assertEquals(test, basicTest);
         Assert.assertNotEquals(sortTestPrice, test);
@@ -270,6 +273,33 @@ public class ListOperationTest {
         for (int i = 0; i < 5; i++) {
             Assert.assertEquals(sortPrice.get(i), sortTestPrice.get(i));
         }
+    }
+
+    @Test
+    public void timeBubbleSort() throws NoEntityException, ExecutionException, InterruptedException, ArrayIndexOutOfBoundsException {
+        Comparator<Car> comparatorName = Comparator.comparing(Car::getName);
+        SimpleList mycar = createIndexList(3000000);
+        mycar = mycar.shuffle();
+
+        SimpleList youcar = createIndexList(1500000);
+        youcar = youcar.shuffle();
+
+
+        long start = System.nanoTime();
+        mycar = mycar.sort(comparatorName);
+        long finish = System.nanoTime();
+        print(mycar);
+
+        long start1 = System.nanoTime();
+        youcar = youcar.sortingThreads(comparatorName);
+        long finish1 = System.nanoTime();
+        print(youcar);
+
+        long elapsed = finish - start;
+        long elapsed1 = finish1 - start1;
+
+        System.out.println("Mycar Время в мс: " + elapsed / 100000);
+        System.out.println("Youcar Время в мс: " + elapsed1 / 100000);
     }
 }
 
